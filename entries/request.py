@@ -15,12 +15,12 @@ def get_all_entries():
         # Write the SQL query to get the information you want
         db_cursor.execute("""
         SELECT
-            a.id,
-            a.date,
-            a.text,
-            a.concept,
-            a.moodId
-        FROM entries a
+            e.id,
+            e.date,
+            e.text,
+            e.concept,
+            e.moodId
+        FROM entries e
         """)
 
         # Initialize an empty list to hold all entry representations
@@ -53,13 +53,13 @@ def get_single_entry(id):
         # into the SQL statement.
         db_cursor.execute("""
         SELECT
-            a.id,
-            a.date,
-            a.text,
-            a.concept,
-            a.moodId
-        FROM entries a
-        WHERE a.id = ?
+            e.id,
+            e.date,
+            e.text,
+            e.concept,
+            e.moodId
+        FROM entries e
+        WHERE e.id = ?
         """, ( id, ))
 
         # Load the single result into memory
@@ -67,48 +67,6 @@ def get_single_entry(id):
 
         # Create an entry instance from the current row
         entry = Entry(data['id'], data['date'], data['text'],
-                            data['concept'], data['moodId'])
+                            data['concept'], data['mood_id'])
 
         return json.dumps(entry.__dict__)    
-
-def create_entry(entry):
-    # Get the id value of the last entry in the list
-    max_id = ENTRIES[-1]["id"]
-
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
-
-    # Add an `id` property to the entry dictionary
-    entry["id"] = new_id
-
-    # Add the entry dictionary to the list
-    ENTRIES.append(entry)
-
-    # Return the dictionary with `id` property added
-    return entry        
-
-def delete_entry(id):
-    # Initial -1 value for entry index, in case one isn't found
-    entry_index = -1
-
-    # Iterate the ENTRIES list, but use enumerate() so that you
-    # can access the index value of each item
-    for index, entry in enumerate(ENTRIES):
-        if entry["id"] == id:
-            # Found the entry. Store the current index.
-            entry_index = index
-
-    # If the entry was found, use pop(int) to remove it from list
-    if entry_index >= 0:
-        ENTRIES.pop(entry_index)
-
-
-
-def update_entry(id, new_entry):
-    # Iterate the ENTRIES list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, entry in enumerate(ENTRIES):
-        if entry["id"] == id:
-            # Found the entry. Update the value.
-            ENTRIES[index] = new_entry
-            break
