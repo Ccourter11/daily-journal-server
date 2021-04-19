@@ -37,7 +37,7 @@ def get_all_entries():
             # exact order of the parameters defined in the
             # Entry class above.
             entry = Entry(row['id'], row['date'], row['text'],
-                            row['concept'], row['moodId'])
+                            row['concept'], row['mood_id'])
 
             entries.append(entry.__dict__)
 
