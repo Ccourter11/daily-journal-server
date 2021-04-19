@@ -19,7 +19,7 @@ def get_all_entries():
             e.date,
             e.text,
             e.concept,
-            e.moodId
+            e.mood_id
         FROM entries e
         """)
 
@@ -57,7 +57,7 @@ def get_single_entry(id):
             e.date,
             e.text,
             e.concept,
-            e.moodId
+            e.mood_id
         FROM entries e
         WHERE e.id = ?
         """, ( id, ))
