@@ -20,7 +20,6 @@ CREATE TABLE `Moods` (
 SELECT * FROM Entries
 
 INSERT INTO `Entries` VALUES (null, "2021-04-15", "SQL", "bad python", 8);
-INSERT INTO `Entries` VALUES (null, "2021-04-15", "SQL", "bad python", 8);
 INSERT INTO `Entries` VALUES (null, "2021-04-20", "SQLite", "oh boy", 3);
 
 INSERT INTO `Moods` VALUES (null, "Happy");
