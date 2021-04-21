@@ -1,6 +1,7 @@
 import sqlite3
 import json
 from models import Entry
+# from models import Mood
 
 ENTRIES = []
 
@@ -17,8 +18,8 @@ def get_all_entries():
         SELECT
             e.id,
             e.date,
-            e.text,
             e.concept,
+            e.text,
             e.moodId
         FROM entries e
         """)
@@ -36,8 +37,8 @@ def get_all_entries():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # Entry class above.
-            entry = Entry(row['id'], row['date'], row['text'],
-                            row['concept'], row['moodId'])
+            entry = Entry(row['id'], row['date'], row['concept'],
+                            row['text'], row['moodId'])
 
             entries.append(entry.__dict__)
 
@@ -55,8 +56,8 @@ def get_single_entry(id):
         SELECT
             e.id,
             e.date,
-            e.text,
             e.concept,
+            e.text,
             e.moodId
         FROM entries e
         WHERE e.id = ?
@@ -66,8 +67,8 @@ def get_single_entry(id):
         data = db_cursor.fetchone()
 
         # Create an entry instance from the current row
-        entry = Entry(data['id'], data['date'], data['text'],
-                            data['concept'], data['moodId'])
+        entry = Entry(data['id'], data['date'], data['concept'],
+                            data['text'], data['moodId'])
 
         return json.dumps(entry.__dict__)    
 
@@ -80,7 +81,7 @@ def delete_entry(id):
         WHERE id = ?
         """, (id, ))        
 
-def get_entry_by_search(phrase):
+def get_entry_by_search(terms):
     with sqlite3.connect("./dailyjournal.db") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
@@ -92,14 +93,13 @@ def get_entry_by_search(phrase):
             e.id,
             e.date,
             e.concept,
-            e.entry,
-            e.moodId,
-            m.mood mood
+            e.text,
+            e.moodId
         FROM Entries e
         LEFT JOIN Moods m
             ON m.id = e.moodId
         WHERE e.concept LIKE ?
-        """, ( f"%{phrase}%", ))
+        """, ( terms, ))
 
         entries = []
         dataset = db_cursor.fetchall()
@@ -107,11 +107,7 @@ def get_entry_by_search(phrase):
         for row in dataset:
             # Create an entry instance from the current row
             entry = Entry(row['id'], row['date'], row['concept'],
-                        row['entry'], row['moodId'])
-            # Create a Mood instance from the current row                
-            mood = Mood(row['id'], row['mood'], )
-            # Add the dictionary representation of the mood to the entry
-            entry.mood = mood.__dict__
+                        row['text'], row['moodId'])
 
             entries.append(entry.__dict__)
 

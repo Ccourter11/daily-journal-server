@@ -2,7 +2,7 @@ CREATE TABLE `Entries` (
 	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	`date`	TEXT NOT NULL,
 	`concept` TEXT NOT NULL,
-    `text`  TEXT,
+	`text` TEXT NOT NULL,
     `moodId` INTEGER,
     FOREIGN KEY(`mood_id`) REFERENCES `moods`(`id`)
 
@@ -19,7 +19,7 @@ CREATE TABLE `Moods` (
 
 SELECT * FROM Entries
 
-INSERT INTO `Entries` VALUES (null, "2021-04-15", "SQL", "bad python", 8);
+INSERT INTO `Entries` VALUES (null, "2021-04-15", "SQL", "databases are amazing", 1);
 INSERT INTO `Entries` VALUES (null, "2021-04-20", "SQLite", "oh boy", 3);
 
 INSERT INTO `Moods` VALUES (null, "Happy");
