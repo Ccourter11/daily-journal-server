@@ -79,3 +79,41 @@ def delete_entry(id):
         DELETE FROM entries
         WHERE id = ?
         """, (id, ))        
+
+def get_entry_by_search(phrase):
+    with sqlite3.connect("./dailyjournal.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Use a ? parameter to inject a variable's value
+        # into the SQL statement.
+        db_cursor.execute("""
+        SELECT
+            e.id,
+            e.date,
+            e.concept,
+            e.entry,
+            e.moodId,
+            m.mood mood
+        FROM Entries e
+        LEFT JOIN Moods m
+            ON m.id = e.moodId
+        WHERE e.concept LIKE ?
+        """, ( f"%{phrase}%", ))
+
+        entries = []
+        dataset = db_cursor.fetchall()
+
+        for row in dataset:
+            # Create an entry instance from the current row
+            entry = Entry(row['id'], row['date'], row['concept'],
+                        row['entry'], row['moodId'])
+            # Create a Mood instance from the current row                
+            mood = Mood(row['id'], row['mood'], )
+            # Add the dictionary representation of the mood to the entry
+            entry.mood = mood.__dict__
+
+            entries.append(entry.__dict__)
+
+    return json.dumps(entries)
+

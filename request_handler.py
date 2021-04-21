@@ -32,6 +32,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 pass  # Request had trailing slash: /animals/
 
             return (resource, id)
+            
     # Here's a class function
     def _set_headers(self, status):
         self.send_response(status)
