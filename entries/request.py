@@ -19,7 +19,7 @@ def get_all_entries():
             e.date,
             e.text,
             e.concept,
-            e.mood_id
+            e.moodId
         FROM entries e
         """)
 
@@ -37,7 +37,7 @@ def get_all_entries():
             # exact order of the parameters defined in the
             # Entry class above.
             entry = Entry(row['id'], row['date'], row['text'],
-                            row['concept'], row['mood_id'])
+                            row['concept'], row['moodId'])
 
             entries.append(entry.__dict__)
 
@@ -57,7 +57,7 @@ def get_single_entry(id):
             e.date,
             e.text,
             e.concept,
-            e.mood_id
+            e.moodId
         FROM entries e
         WHERE e.id = ?
         """, ( id, ))
@@ -67,6 +67,15 @@ def get_single_entry(id):
 
         # Create an entry instance from the current row
         entry = Entry(data['id'], data['date'], data['text'],
-                            data['concept'], data['mood_id'])
+                            data['concept'], data['moodId'])
 
         return json.dumps(entry.__dict__)    
+
+def delete_entry(id):
+    with sqlite3.connect("./dailyjournal.db") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        DELETE FROM entries
+        WHERE id = ?
+        """, (id, ))        
