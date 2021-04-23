@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from entries import get_all_entries, get_single_entry, delete_entry
+from entries import get_all_entries, get_single_entry, delete_entry, get_entry_by_search
 from moods import get_all_moods, get_single_mood
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -27,11 +27,12 @@ class HandleRequests(BaseHTTPRequestHandler):
             try:
                 id = int(path_params[2])
             except IndexError:
-                pass  # No route parameter exists: /animals
+                pass  
             except ValueError:
-                pass  # Request had trailing slash: /animals/
+                pass  
 
             return (resource, id)
+
     # Here's a class function
     def _set_headers(self, status):
         self.send_response(status)
@@ -46,49 +47,63 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')
         self.end_headers()
-    
-    def parse_url(self, path):
-        # Just like splitting a string in JavaScript. If the
-        # path is "/animals/1", the resulting list will
-        # have "" at index 0, "animals" at index 1, and "1"
-        # at index 2.
-        path_params = path.split("/")
-        resource = path_params[1]
-        id = None
+        
 
-        # Try to get the item at index 2
-        try:
-            # Convert the string "1" to the integer 1
-            # This is the new parseInt()
-            id = int(path_params[2])
-        except IndexError:
-            pass  # No route parameter exists: /animals
-        except ValueError:
-            pass  # Request had trailing slash: /animals/
-
-        return (resource, id)  # This is a tuple
-    
     def do_GET(self):
+        # You should be able to identify a Python function.
         self._set_headers(200)
-        response = {}  # Default response
 
-        # Parse the URL and capture the tuple that is returned
-        (resource, id) = self.parse_url(self.path)
+        response = {}
 
-        if resource == "entries":
-            if id is not None:
-                response = f"{get_single_entry(id)}"
+        # Parse URL and store entire tuple in a variable
+        parsed = self.parse_url(self.path)
 
-            else:
-                response = f"{get_all_entries()}"
+        # Response from parse_url() is a tuple with 2
+        # items in it, which means the request was for
+        # `/entries` or `/entries/2`
+        # You should be able to identify a Python if block.
+        # len is like .length in javascript
+        if len(parsed) == 2:
+            ( resource, id ) = parsed
 
-            if resource == "moods":
+            if resource == "entries":
                 if id is not None:
-                    response = get_single_mood(id)
+                    response = f"{get_single_entry(id)}"
                 else:
-                    response = get_all_moods()    
+                    response = f"{get_all_entries()}"
+            elif resource == "moods":
+                if id is not None:
+                    response = f"{get_single_mood(id)}"
+                else:
+                    response = f"{get_all_moods()}"
 
+        # # Response from parse_url() is a tuple with 3
+        # # items in it, which means the request was for
+        # # `/resource?parameter=value`
+        elif len(parsed) == 3:
+            ( resource, key, value ) = parsed
+
+        #     # Is the resource `customers` and was there a
+        #     # query parameter that specified the customer
+        #     # email as a filtering value?
+            if key == "s" and resource == "entries":
+                response = f"{get_entry_by_search(value)}"
+
+        # encode is expecting a string, we put the responses in f strings if they are not
+        # coming back as a string
         self.wfile.write(response.encode())
+
+    # It handles any POST request.
+    def do_POST(self):
+        # Set response code to 'Created'
+        self._set_headers(201)
+
+        content_len = int(self.headers.get('content-length', 0))
+        post_body = self.rfile.read(content_len)
+        response = f"received post request:<br>{post_body}"
+        self.wfile.write(response.encode())    
+
+        
 
     def do_DELETE(self):
         # Set a 204 response code
@@ -103,8 +118,10 @@ class HandleRequests(BaseHTTPRequestHandler):
        
 
         # Encode the new e and send in response
-        self.wfile.write("".encode())        
+        self.wfile.write("".encode())    
 
+
+    
 def main():
     host = ''
     port = 8088
