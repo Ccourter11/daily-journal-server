@@ -68,14 +68,14 @@ class HandleRequests(BaseHTTPRequestHandler):
 
             if resource == "entries":
                 if id is not None:
-                    response = {get_single_entry(id)}
+                    response = f"{get_single_entry(id)}"
                 else:
-                    response = {get_all_entries()}
+                    response = f"{get_all_entries()}"
             elif resource == "moods":
                 if id is not None:
-                    response = {get_single_mood(id)}
+                    response = f"{get_single_mood(id)}"
                 else:
-                    response = {get_all_moods()}
+                    response = f"{get_all_moods()}"
 
         # # Response from parse_url() is a tuple with 3
         # # items in it, which means the request was for

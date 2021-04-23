@@ -1,7 +1,7 @@
 import sqlite3
 import json
 from models import Entry
-# from models import Mood
+from models import Mood
 
 ENTRIES = []
 
@@ -20,8 +20,10 @@ def get_all_entries():
             e.date,
             e.concept,
             e.text,
-            e.moodId
+            m.id as moodId,
+            m.mood
         FROM entries e
+        JOIN Moods m on e.moodId = m.id
         """)
 
         # Initialize an empty list to hold all entry representations
@@ -39,6 +41,9 @@ def get_all_entries():
             # Entry class above.
             entry = Entry(row['id'], row['date'], row['concept'],
                             row['text'], row['moodId'])
+
+            taco = Mood(row['moodId'], row['mood'])    
+            entry.mood = taco.__dict__            
 
             entries.append(entry.__dict__)
 
@@ -69,6 +74,8 @@ def get_single_entry(id):
         # Create an entry instance from the current row
         entry = Entry(data['id'], data['date'], data['concept'],
                             data['text'], data['moodId'])
+
+        mood = Mood(data['id'], data['mood'])                      
 
         return json.dumps(entry.__dict__)    
 
@@ -108,6 +115,8 @@ def get_entry_by_search(terms):
             # Create an entry instance from the current row
             entry = Entry(row['id'], row['date'], row['concept'],
                         row['text'], row['moodId'])
+
+
 
             entries.append(entry.__dict__)
 
